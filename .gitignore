@@ -1,0 +1,13 @@
+.DS_Store
+
+*.py[cod]
+__pycache__/
+
+scraps/
+
+sgp30-baseline
+sgp30.py
+
+gsheets-creds.json
+
+*.wav
