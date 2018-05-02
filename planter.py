@@ -83,13 +83,13 @@ class SensorThread(Thread):
         self._chip.open()
 
         try:
+            if self.__co2_baseline is not None:
+                self._chip.set_baseline(self.__co2_baseline, self.__voc_baseline)
+                print('Restored baselines', file=stderr)
+
             while True:
                 if self.terminate_asap:
                     break
-
-                if self.__co2_baseline is not None:
-                    self._chip.set_baseline(self.__co2_baseline, self.__voc_baseline)
-                    print('Restored baselines', file=stderr)
 
                 self._loop()
         finally:
@@ -148,7 +148,6 @@ class ThePlanter(object):
     def setup(self):
         self.cougher.setup()
         self.smbus.open(1)  # 0 on some devices
-        self.sensor_thread.start()
 
     def teardown(self):
         if self.sensor_thread is None:
@@ -156,7 +155,8 @@ class ThePlanter(object):
 
         print('Waiting on sensor thread to terminate...', file=stderr)
         self.sensor_thread.terminate_asap = True
-        self.sensor_thread.join()
+        if self.sensor_thread.is_alive():
+            self.sensor_thread.join()
         self.sensor_thread = None
 
         self.smbus.close()

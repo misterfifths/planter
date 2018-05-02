@@ -123,11 +123,13 @@ class Cougher(object):
         self._pyaudio_instance = pyaudio.PyAudio()
 
     def teardown(self):
-        self._cough_waveform.close()
-        self._cough_waveform = None
+        if self._cough_waveform is not None:
+            self._cough_waveform.close()
+            self._cough_waveform = None
 
-        self._pyaudio_instance.terminate()
-        self._pyaudio_instance = None
+        if self._pyaudio_instance is not None:
+            self._pyaudio_instance.terminate()
+            self._pyaudio_instance = None
 
     @classmethod
     def _get_normalized_volume_samples(cls, audio):
