@@ -31,7 +31,7 @@ class GoogleSheetsLogger(object):
 
     def log(self, air_quality):
         try:
-            self._worksheet.append_row((datetime.now().isoformat(sep=' '), air_quality.co2_ppm, air_quality.voc_ppb))
+            self._worksheet.append_row((air_quality.timestamp.isoformat(sep=' '), air_quality.co2_ppm, air_quality.voc_ppb))
             print('[logged]', file=stderr)
         except:
             print('[logging error]', file=stderr)

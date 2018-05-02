@@ -63,11 +63,12 @@ class SensorThread(Thread):
 
         self.terminate_asap = False
 
-        self.__baselines = None
+        self.__co2_baseline = self.__voc_baseline = None
         if self.baseline_cache_path:
             try:
                 with open(baseline_cache_path) as f:
-                    self.__baselines = (int(f.readline()), int(f.readline()))
+                    self.__co2_baseline = int(f.readline())
+                    self.__voc_baseline = int(f.readline())
             except Exception as exc:
                 print('Error loading baseline:', exc, file=stderr)
 
@@ -86,8 +87,8 @@ class SensorThread(Thread):
                 if self.terminate_asap:
                     break
 
-                if self.__baselines is not None:
-                    self._chip.set_baseline(*self.__baselines)
+                if self.__co2_baseline is not None:
+                    self._chip.set_baseline(self.__co2_baseline, self.__voc_baseline)
                     print('Restored baselines', file=stderr)
 
                 self._loop()
@@ -119,9 +120,9 @@ class SensorThread(Thread):
 
     def _store_baselines(self):
         if self.baseline_cache_path:
-            co2_baseline, voc_baseline = self._chip.get_baseline()
+            baseline = self._chip.get_baseline()
             with open(self.baseline_cache_path, 'w') as f:
-                f.write(str(co2_baseline) + "\n" + str(voc_baseline))
+                f.write(str(baseline.raw_co2) + "\n" + str(baseline.raw_voc))
 
 
 class ThePlanter(object):
@@ -185,8 +186,9 @@ class ThePlanter(object):
                     return
 
                 now = time()
-                if now - time_at_start_of_last_loop < min_sleep_between_loop_calls:
-                    sleep(min_sleep_between_loop_calls)
+                needed_extra_sleep = min_sleep_between_loop_calls - (now - time_at_start_of_last_loop)
+                if needed_extra_sleep >= 0:
+                    sleep(needed_extra_sleep)
         except Exception as exc:
             print('Going down:', exc, file=stderr)
         finally:

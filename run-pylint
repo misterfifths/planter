@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pylint -dunused-import -dwrong-import-order -dmissing-docstring -dinvalid-name -dunused-variable -dimport-error -dline-too-long -dtoo-many-arguments -dtoo-few-public-methods -dunused-argument -dbad-continuation -dtoo-many-instance-attributes -dbroad-except -dbare-except *.py
+pylint -dunused-import -dwrong-import-order -dmissing-docstring -dinvalid-name -dunused-variable -dimport-error -dline-too-long -dtoo-many-arguments -dtoo-few-public-methods -dunused-argument -dbad-continuation -dtoo-many-instance-attributes -dbroad-except -dbare-except -dunbalanced-tuple-unpacking *.py
